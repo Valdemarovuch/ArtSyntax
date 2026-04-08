@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { Plus } from 'lucide-react'
 import { GalleryCard } from './gallery-card'
 import type { Prompt } from '@/lib/prompts-data'
 
@@ -9,10 +10,11 @@ interface MasonryGridProps {
   onViewPrompt: (prompt: Prompt) => void
   favorites: Set<string>
   onToggleFavorite: (id: string) => void
+  isAdmin?: boolean
+  onAddPrompt?: () => void
 }
 
-export function MasonryGrid({ prompts, onViewPrompt, favorites, onToggleFavorite }: MasonryGridProps) {
-  // Distribute items into columns for masonry effect
+export function MasonryGrid({ prompts, onViewPrompt, favorites, onToggleFavorite, isAdmin, onAddPrompt }: MasonryGridProps) {
   const columns = useMemo(() => {
     const cols: Prompt[][] = [[], [], []]
     prompts.forEach((prompt, index) => {
@@ -21,7 +23,7 @@ export function MasonryGrid({ prompts, onViewPrompt, favorites, onToggleFavorite
     return cols
   }, [prompts])
 
-  if (prompts.length === 0) {
+  if (prompts.length === 0 && !isAdmin) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
         <div className="mb-4 rounded-full bg-white/5 p-6">
@@ -37,14 +39,48 @@ export function MasonryGrid({ prompts, onViewPrompt, favorites, onToggleFavorite
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {columns.map((column, colIndex) => (
+      {/* Column 0 — optionally prepend the Admin "Add" card */}
+      <div className="flex flex-col gap-6">
+        {isAdmin && (
+          <button
+            onClick={onAddPrompt}
+            className="group flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-white/20 bg-white/[0.03] text-neutral-500 transition-all hover:border-white/40 hover:bg-white/[0.06] hover:text-white"
+          >
+            <div className="flex size-12 items-center justify-center rounded-full border border-white/20 bg-white/5 transition-colors group-hover:border-white/40 group-hover:bg-white/10">
+              <Plus className="size-6" />
+            </div>
+            <span className="text-sm font-medium">Add New Prompt</span>
+          </button>
+        )}
+        {columns[0].map((prompt, promptIndex) => (
+          <div
+            key={prompt.id}
+            className="animate-in fade-in slide-in-from-bottom-4"
+            style={{
+              animationDelay: `${promptIndex * 50}ms`,
+              animationDuration: '600ms',
+              animationFillMode: 'both',
+            }}
+          >
+            <GalleryCard
+              prompt={prompt}
+              onView={onViewPrompt}
+              isFavorite={favorites.has(prompt.id)}
+              onToggleFavorite={onToggleFavorite}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Columns 1 and 2 */}
+      {[1, 2].map((colIndex) => (
         <div key={colIndex} className="flex flex-col gap-6">
-          {column.map((prompt, promptIndex) => (
+          {columns[colIndex].map((prompt, promptIndex) => (
             <div
               key={prompt.id}
               className="animate-in fade-in slide-in-from-bottom-4"
               style={{
-                animationDelay: `${(colIndex * column.length + promptIndex) * 50}ms`,
+                animationDelay: `${(colIndex * columns[colIndex].length + promptIndex) * 50}ms`,
                 animationDuration: '600ms',
                 animationFillMode: 'both',
               }}

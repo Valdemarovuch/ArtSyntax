@@ -1,6 +1,7 @@
 'use client'
 
-import { Search, Shuffle, Heart, Image as ImageIcon } from 'lucide-react'
+import { Search, Shuffle, Heart, Image as ImageIcon, Lock, LayoutDashboard } from 'lucide-react'
+import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -25,6 +26,7 @@ interface GalleryHeaderProps {
     totalPrompts: number
     filteredCount: number
     favoritesCount: number
+    isAdmin?: boolean
 }
 
 export function GalleryHeader({
@@ -40,6 +42,7 @@ export function GalleryHeader({
     totalPrompts,
     filteredCount,
     favoritesCount,
+    isAdmin = false,
 }: GalleryHeaderProps) {
     return (
         <header className="sticky top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
@@ -70,15 +73,36 @@ export function GalleryHeader({
                             </div>
                         </div>
 
-                        {/* Random Button */}
-                        <Button
-                            onClick={onRandomPrompt}
-                            variant="outline"
-                            className="border-white/10 bg-white/5 text-white transition-all duration-300 hover:bg-white hover:text-black"
-                        >
-                            <Shuffle className="mr-2 size-4" />
-                            Random
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            {/* Admin indicator */}
+                            {isAdmin ? (
+                                <Link
+                                    href="/admin"
+                                    className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:border-white/20 hover:text-white"
+                                >
+                                    <LayoutDashboard className="size-3.5" />
+                                    Admin
+                                </Link>
+                            ) : (
+                                <Link
+                                    href="/admin/login"
+                                    className="flex items-center justify-center rounded-lg p-1.5 text-neutral-700 transition-colors hover:text-neutral-500"
+                                    title="Admin login"
+                                >
+                                    <Lock className="size-3.5" />
+                                </Link>
+                            )}
+
+                            {/* Random Button */}
+                            <Button
+                                onClick={onRandomPrompt}
+                                variant="outline"
+                                className="border-white/10 bg-white/5 text-white transition-all duration-300 hover:bg-white hover:text-black"
+                            >
+                                <Shuffle className="mr-2 size-4" />
+                                Random
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Bottom row: Search and Filters */}

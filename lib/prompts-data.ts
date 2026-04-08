@@ -1,18 +1,8 @@
-export interface Prompt {
-  id: string
-  imageUrl: string
-  title: string
-  corePrompt: string
-  negativePrompt: string
-  model: string
-  category: string
-  aspectRatio: string
-  seed?: number
-  steps?: number
-  cfgScale?: number
-}
+export type { Prompt } from './types'
+export { rowToPrompt } from './types'
 
-export const prompts: Prompt[] = [
+// Legacy static array kept for reference; gallery now reads from Supabase.
+const _staticPrompts = [
   {
     id: '1',
     imageUrl: 'https://images.unsplash.com/photo-1634017839464-5c339bbe3c35?w=800&auto=format&fit=crop&q=80',
@@ -171,6 +161,39 @@ export const prompts: Prompt[] = [
   },
 ]
 
-export const models = ['All Models', 'Midjourney v6', 'DALL-E 3', 'Stable Diffusion XL']
-export const categories = ['All Categories', 'Landscape', 'Abstract', 'Sci-Fi', 'Portrait', 'Space', 'Art', 'Nature']
-export const aspectRatios = ['All Ratios', '1:1', '4:5', '4:3', '3:2', '16:9', '21:9']
+export const models = [
+  'All Models',
+  'Midjourney v6',
+  'DALL-E 3',
+  'Stable Diffusion XL',
+  'Stable Diffusion 3',
+  'Adobe Firefly',
+  'Leonardo AI',
+  'Ideogram',
+]
+
+export const categories = [
+  'All Categories',
+  'Landscape',
+  'Portrait',
+  'Abstract',
+  'Sci-Fi',
+  'Fantasy',
+  'Architecture',
+  'Nature',
+  'Character',
+  'Product',
+  'Space',
+  'Art',
+]
+
+export const aspectRatios = [
+  'All Ratios',
+  '1:1',
+  '4:5',
+  '16:9',
+  '21:9',
+  '9:16',
+  '4:3',
+  '3:2',
+]
