@@ -7,7 +7,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: 'ArtSyntax — AI Prompt Database & Discovery',
+    title: 'ArtSyntax',
     description: 'Discover and explore a curated collection of AI-generated art prompts',
     generator: 'v0.app',
     icons: {

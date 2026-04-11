@@ -1,6 +1,7 @@
 'use client'
 
-import { Search, Shuffle, Heart, Image as ImageIcon, Lock, LayoutDashboard } from 'lucide-react'
+import { useTransition } from 'react'
+import { Search, Shuffle, Heart, Image as ImageIcon, User, LayoutDashboard, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -11,7 +12,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { models, categories, aspectRatios } from '@/lib/prompts-data'
+import { gallerySignOutAction } from '@/app/admin/actions'
 
 interface GalleryHeaderProps {
     searchQuery: string
@@ -27,6 +37,9 @@ interface GalleryHeaderProps {
     filteredCount: number
     favoritesCount: number
     isAdmin?: boolean
+    isLoggedIn?: boolean
+    userEmail?: string
+    onOpenAuth?: () => void
 }
 
 export function GalleryHeader({
@@ -43,12 +56,21 @@ export function GalleryHeader({
     filteredCount,
     favoritesCount,
     isAdmin = false,
+    isLoggedIn = false,
+    userEmail,
+    onOpenAuth,
 }: GalleryHeaderProps) {
+    const [isPending, startTransition] = useTransition()
+
+    function handleSignOut() {
+        startTransition(() => gallerySignOutAction())
+    }
+
     return (
         <header className="sticky top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
             <div className="mx-auto max-w-7xl px-6 py-5">
                 <div className="flex flex-col gap-5">
-                    {/* Top row: Logo, Stats, Random */}
+                    {/* Top row */}
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-6">
                             <h1 className="text-xl font-semibold tracking-tight text-white">
@@ -74,23 +96,58 @@ export function GalleryHeader({
                         </div>
 
                         <div className="flex items-center gap-2">
-                            {/* Admin indicator */}
-                            {isAdmin ? (
-                                <Link
-                                    href="/admin"
-                                    className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:border-white/20 hover:text-white"
-                                >
-                                    <LayoutDashboard className="size-3.5" />
-                                    Admin
-                                </Link>
+                            {isLoggedIn ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="gap-2 border-white/10 bg-white/5 text-neutral-300 hover:bg-white/10 hover:text-white"
+                                        >
+                                            <User className="size-3.5" />
+                                            <span className="hidden max-w-[120px] truncate text-xs sm:block">
+                                                {userEmail}
+                                            </span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                        align="end"
+                                        className="w-52 border-white/10 bg-neutral-950 text-white"
+                                    >
+                                        <DropdownMenuLabel className="truncate text-xs font-normal text-neutral-500">
+                                            {userEmail}
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator className="bg-white/10" />
+                                        {isAdmin && (
+                                            <DropdownMenuItem asChild>
+                                                <Link
+                                                    href="/admin"
+                                                    className="flex cursor-pointer items-center gap-2"
+                                                >
+                                                    <LayoutDashboard className="size-4" />
+                                                    Admin Panel
+                                                </Link>
+                                            </DropdownMenuItem>
+                                        )}
+                                        <DropdownMenuItem
+                                            disabled={isPending}
+                                            onSelect={handleSignOut}
+                                            className="flex cursor-pointer items-center gap-2 text-red-400 focus:text-red-400"
+                                        >
+                                            <LogOut className="size-4" />
+                                            Sign out
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             ) : (
-                                <Link
-                                    href="/admin/login"
-                                    className="flex items-center justify-center rounded-lg p-1.5 text-neutral-700 transition-colors hover:text-neutral-500"
-                                    title="Admin login"
+                                <Button
+                                    onClick={onOpenAuth}
+                                    variant="outline"
+                                    size="sm"
+                                    className="border-white/10 bg-white/5 text-neutral-300 hover:bg-white hover:text-black"
                                 >
-                                    <Lock className="size-3.5" />
-                                </Link>
+                                    Sign in
+                                </Button>
                             )}
 
                             {/* Random Button */}

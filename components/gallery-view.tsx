@@ -5,14 +5,22 @@ import { GalleryHeader } from '@/components/gallery-header'
 import { MasonryGrid } from '@/components/masonry-grid'
 import { PromptModal } from '@/components/prompt-modal'
 import { AdminCreateModal } from '@/components/admin-create-modal'
+import { AuthModal } from '@/components/auth-modal'
 import type { Prompt } from '@/lib/prompts-data'
 
 interface GalleryViewProps {
   initialPrompts: Prompt[]
   isAdmin?: boolean
+  isLoggedIn?: boolean
+  userEmail?: string
 }
 
-export function GalleryView({ initialPrompts, isAdmin = false }: GalleryViewProps) {
+export function GalleryView({
+  initialPrompts,
+  isAdmin = false,
+  isLoggedIn = false,
+  userEmail,
+}: GalleryViewProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedModel, setSelectedModel] = useState('All Models')
   const [selectedCategory, setSelectedCategory] = useState('All Categories')
@@ -20,6 +28,7 @@ export function GalleryView({ initialPrompts, isAdmin = false }: GalleryViewProp
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
 
   // Load favorites from localStorage on mount
@@ -34,7 +43,6 @@ export function GalleryView({ initialPrompts, isAdmin = false }: GalleryViewProp
     }
   }, [])
 
-  // Save favorites to localStorage
   const toggleFavorite = useCallback((id: string) => {
     setFavorites(prev => {
       const next = new Set(prev)
@@ -91,7 +99,6 @@ export function GalleryView({ initialPrompts, isAdmin = false }: GalleryViewProp
     setSelectedPrompt(filteredPrompts[newIndex])
   }, [selectedPrompt, filteredPrompts])
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!modalOpen) return
@@ -123,6 +130,9 @@ export function GalleryView({ initialPrompts, isAdmin = false }: GalleryViewProp
         filteredCount={filteredPrompts.length}
         favoritesCount={favorites.size}
         isAdmin={isAdmin}
+        isLoggedIn={isLoggedIn}
+        userEmail={userEmail}
+        onOpenAuth={() => setAuthModalOpen(true)}
       />
 
       <main className="mx-auto max-w-7xl px-6 py-12">
@@ -157,6 +167,8 @@ export function GalleryView({ initialPrompts, isAdmin = false }: GalleryViewProp
           onOpenChange={setCreateModalOpen}
         />
       )}
+
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
     </div>
   )
 }

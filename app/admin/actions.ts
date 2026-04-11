@@ -149,3 +149,52 @@ export async function createPromptQuickAction(
   return {}
 }
 
+// ── Gallery user auth (sign in / sign up / sign out) ─────────────────────────
+
+export async function gallerySignInAction(
+  _prev: { error?: string; isAdmin?: boolean } | null,
+  formData: FormData
+): Promise<{ error?: string; isAdmin?: boolean }> {
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
+
+  if (!email || !password) return { error: 'Email and password are required' }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+  if (error) return { error: 'Invalid email or password' }
+
+  const admin = createAdminClient()
+  const { data: adminRow } = await admin
+    .from('admin_users')
+    .select('id')
+    .eq('id', data.user.id)
+    .single()
+
+  return { isAdmin: !!adminRow }
+}
+
+export async function gallerySignUpAction(
+  _prev: { error?: string; success?: boolean } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
+
+  if (!email || !password) return { error: 'Email and password are required' }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.signUp({ email, password })
+
+  if (error) return { error: error.message }
+
+  return { success: true }
+}
+
+export async function gallerySignOutAction() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect('/')
+}
+

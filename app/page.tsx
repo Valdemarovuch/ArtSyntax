@@ -27,5 +27,12 @@ export default async function Home() {
 
   const prompts = (rows as PromptRow[] ?? []).map(rowToPrompt)
 
-  return <GalleryView initialPrompts={prompts} isAdmin={isAdmin} />
+  return (
+    <GalleryView
+      initialPrompts={prompts}
+      isAdmin={isAdmin}
+      isLoggedIn={!!user}
+      userEmail={user?.email}
+    />
+  )
 }
