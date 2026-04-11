@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Eye, Copy, Check, Heart } from 'lucide-react'
+import { Eye, Copy, Check, Heart, ShieldCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Prompt } from '@/lib/prompts-data'
 
@@ -40,6 +40,17 @@ export function GalleryCard({ prompt, onView, isFavorite, onToggleFavorite }: Ga
       {isFavorite && (
         <div className="absolute left-3 top-3 z-20">
           <Heart className="size-5 fill-red-500 text-red-500 drop-shadow-lg" />
+        </div>
+      )}
+
+      {/* Admin badge */}
+      {prompt.isAdminPost && (
+        <div
+          className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-black backdrop-blur-sm"
+          title="Official admin prompt"
+        >
+          <ShieldCheck className="size-3" />
+          Admin
         </div>
       )}
 

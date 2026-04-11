@@ -141,7 +141,7 @@ export function GalleryView({
           onViewPrompt={handleViewPrompt}
           favorites={favorites}
           onToggleFavorite={toggleFavorite}
-          isAdmin={isAdmin}
+          isLoggedIn={isLoggedIn}
           onAddPrompt={() => setCreateModalOpen(true)}
         />
       </main>
@@ -161,7 +161,7 @@ export function GalleryView({
         totalCount={filteredPrompts.length}
       />
 
-      {isAdmin && (
+      {isLoggedIn && (
         <AdminCreateModal
           open={createModalOpen}
           onOpenChange={setCreateModalOpen}

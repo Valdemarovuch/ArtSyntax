@@ -10,6 +10,8 @@ export interface Prompt {
   seed?: number
   steps?: number
   cfgScale?: number
+  createdBy?: string
+  isAdminPost?: boolean
 }
 
 /** Row shape as stored in Supabase (snake_case) */
@@ -27,6 +29,8 @@ export interface PromptRow {
   cfg_scale: number | null
   created_at: string
   updated_at: string
+  created_by: string | null
+  is_admin_post: boolean
 }
 
 export function rowToPrompt(row: PromptRow): Prompt {
@@ -42,6 +46,8 @@ export function rowToPrompt(row: PromptRow): Prompt {
     seed: row.seed ?? undefined,
     steps: row.steps ?? undefined,
     cfgScale: row.cfg_scale ?? undefined,
+    createdBy: row.created_by ?? undefined,
+    isAdminPost: row.is_admin_post,
   }
 }
 

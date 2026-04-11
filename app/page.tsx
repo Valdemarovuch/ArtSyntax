@@ -10,7 +10,7 @@ export default async function Home() {
   const supabase = await createClient()
 
   const [{ data: rows }, { data: { user } }] = await Promise.all([
-    supabase.from('prompts').select('*').order('created_at', { ascending: false }),
+    supabase.from('prompts').select('*, created_by, is_admin_post').order('created_at', { ascending: false }),
     supabase.auth.getUser(),
   ])
 

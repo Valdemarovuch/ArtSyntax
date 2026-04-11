@@ -112,7 +112,7 @@ export async function deletePromptAction(id: string) {
   revalidatePath('/admin/posts')
 }
 
-// ── Quick create from gallery modal (no redirect) ────────────────────────────
+// ── Quick create from gallery modal (any logged-in user) ─────────────────────
 
 export async function createPromptQuickAction(
   _prevState: { error?: string } | null,
@@ -120,15 +120,16 @@ export async function createPromptQuickAction(
 ): Promise<{ error?: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  if (!user) return { error: 'Please sign in to add a prompt' }
 
   const admin = createAdminClient()
+
+  // Detect if the caller is an admin – no error if they're not, just a flag
   const { data: adminRow } = await admin
     .from('admin_users')
     .select('id')
     .eq('id', user.id)
     .single()
-  if (!adminRow) return { error: 'Not authorized' }
 
   const { error } = await admin.from('prompts').insert({
     title: formData.get('title') as string,
@@ -141,6 +142,8 @@ export async function createPromptQuickAction(
     seed: formData.get('seed') ? Number(formData.get('seed')) : null,
     steps: formData.get('steps') ? Number(formData.get('steps')) : null,
     cfg_scale: formData.get('cfg_scale') ? Number(formData.get('cfg_scale')) : null,
+    created_by: user.id,
+    is_admin_post: !!adminRow,
   })
 
   if (error) return { error: error.message }
